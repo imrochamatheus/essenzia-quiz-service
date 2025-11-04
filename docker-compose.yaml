@@ -1,0 +1,9 @@
+services:
+  db:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: essenzia_quiz_db
+      POSTGRES_USER: supersecretuser
+      POSTGRES_PASSWORD: supersecretpass
+    ports:
+      - "5432:5432"
