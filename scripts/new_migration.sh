@@ -2,12 +2,12 @@
 
 set -e
 
-BASE_DIR="db/migrations"
-VALID_TYPES=("migration" "undo" "repair")
+BASE_DIR="src/main/resources/migrations"
+VALID_TYPES=("schema" "seed")
 
 if [ -z "$1" ]; then
   echo "Uso: ./scripts/new_migration.sh \"descrição da migration\" [tipo]"
-  echo "Tipos válidos: migration (default), undo, repair"
+  echo "Tipos válidos: schema (default), seed"
   exit 1
 fi
 
@@ -20,14 +20,17 @@ if [[ ! " ${VALID_TYPES[*]} " =~ " ${TYPE} " ]]; then
   exit 1
 fi
 
-MIGRATIONS_DIR="${BASE_DIR}/${TYPE}"
+if [ "$TYPE" = "seed" ]; then
+  MIGRATIONS_DIR="${BASE_DIR}/schema/seed"
+else
+  MIGRATIONS_DIR="${BASE_DIR}/schema"
+fi
 mkdir -p "$MIGRATIONS_DIR"
 
-if [ "$TYPE" = "migration" ]; then
-  last=$(ls "${BASE_DIR}/migration"/V*__*.sql 2>/dev/null | sed 's/^.*V\([0-9]*\)__.*$/\1/' | sort -n | tail -1)
-else
-  last=$(ls "$MIGRATIONS_DIR"/V*__*.sql 2>/dev/null | sed 's/^.*V\([0-9]*\)__.*$/\1/' | sort -n | tail -1)
-fi
+last=$(find "${BASE_DIR}" -type f -name 'V*__*.sql' ! -path "*/undo/*" 2>/dev/null \
+  | sed 's/^.*V\([0-9]*\)__.*$/\1/' \
+  | sort -n | tail -1)
+
 if [ -z "$last" ]; then
   last=0
 fi
@@ -52,7 +55,7 @@ EOF
 
 echo "Criado: $filepath"
 
-if [ "$TYPE" = "migration" ]; then
+if [ "$TYPE" = "schema" ]; then
   undo_dir="${BASE_DIR}/undo"
   mkdir -p "$undo_dir"
   undo_path="${undo_dir}/${filename}"

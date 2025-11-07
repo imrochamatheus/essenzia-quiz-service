@@ -1,24 +1,23 @@
 -- ==============================================
 -- Migration: V1__create_enums_and_tables.sql
--- Tipo: migration
+-- Tipo: schema
 -- Criada em: 2025-11-04 15:44:32
 -- ==============================================
-
 -- Escreva seus comandos SQL abaixo:
 CREATE TYPE yes_no_maybe AS ENUM (
-    'YES',
-    'NO',
-    'MAYBE'
+    'yes',
+    'no',
+    'maybe'
 );
 
 CREATE TYPE archetype_type AS ENUM (
-    'DOMINANT',
-    'COMPLEMENTARY'
+    'dominant',
+    'complementary'
 );
 
 CREATE TYPE "source" AS ENUM (
-    'QUIZ',
-    'MANUAL'
+    'quiz',
+    'manual'
 );
 
 CREATE TABLE gender (
@@ -105,6 +104,20 @@ CREATE TABLE lifestyle_i18n (
     PRIMARY KEY (lifestyle_id, locale)
 );
 
+CREATE TABLE sexual_orientation (
+    id      SERIAL PRIMARY KEY,
+    code    VARCHAR(50) UNIQUE NOT NULL,
+    active  BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE sexual_orientation_i18n (
+    sexual_orientation_id   INT NOT NULL REFERENCES sexual_orientation(id) ON DELETE CASCADE,
+    locale                  VARCHAR(10) NOT NULL,
+    "name"                  VARCHAR(100) NOT NULL,
+
+    PRIMARY KEY (sexual_orientation_id, locale)
+);
+
 CREATE TABLE "user" (
     id                          SERIAL PRIMARY KEY,
     "name"                      VARCHAR(150) NOT NULL,
@@ -129,13 +142,13 @@ CREATE TABLE "user" (
 );
 
 CREATE TABLE archetype (
-    id          SERIAL PRIMARY KEY,
-    code        VARCHAR(100) NOT NULL UNIQUE,
-    emoji       VARCHAR(50) NOT NULL,
-    name_i18n   JSONB NOT NULL,
-    short_i18n  JSONB,
-    long_i18n   JSONB,
-    active      BOOLEAN DEFAULT TRUE
+    id                   SERIAL PRIMARY KEY,
+    code                 VARCHAR(100) NOT NULL UNIQUE,
+    emoji                VARCHAR(50) NOT NULL,
+    name_i18n            JSONB NOT NULL,
+    dominant_i18n        JSONB,
+    complementary_i18n   JSONB,
+    active               BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE user_archetype (
