@@ -1,7 +1,7 @@
 -- ==============================================
--- Migration: V5__insert_user_info_options.sql
+-- Migration: R__3_insert_user_info_options.sql
 -- Tipo: seed
--- Criada em: 2025-11-06 12:34:50
+-- Criada em: 2025-11-07 11:49:12
 -- ==============================================
 
 -- Escreva seus comandos SQL abaixo:

@@ -1,7 +1,7 @@
 -- ==============================================
--- Migration: V4__insert_questions.sql
+-- Migration: R__2_insert_questions.sql
 -- Tipo: seed
--- Criada em: 2025-11-05 11:12:01
+-- Criada em: 2025-11-07 11:49:10
 -- ==============================================
 
 -- Escreva seus comandos SQL abaixo:

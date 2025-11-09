@@ -1,7 +1,7 @@
 -- ==============================================
--- Migration: V3__insert_archetypes.sql
+-- Migration: R__1_insert_archetypes.sql
 -- Tipo: seed
--- Criada em: 2025-11-07 09:45:49
+-- Criada em: 2025-11-07 11:49:08
 -- ==============================================
 
 -- Escreva seus comandos SQL abaixo:

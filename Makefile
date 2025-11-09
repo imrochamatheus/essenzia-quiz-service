@@ -1,10 +1,10 @@
 NEW_MIGRATION := scripts/new_migration.sh
 
 ENV ?= dev
+DEBUG ?= false
 TYPE ?= schema
-MIGRATIONS_PATH = src/main/resources/migrations
+MIGRATIONS_PATH = src/main/resources/db/migrations
 
-DEBUG_FLAG :=
 ifeq ($(DEBUG),True)
 	DEBUG_FLAG = -X
 endif
@@ -19,7 +19,7 @@ $(NEW_MIGRATION):
 create-migration: $(NEW_MIGRATION)
 	@if [ -z "$(MESSAGE)" ]; then \
 		echo "ERRO: Você precisa informar uma mensagem."; \
-		echo "Exemplo: make migration MESSAGE='create_user_table' [TYPE=schema|seed]"; \
+		echo "Exemplo: make create-migration MESSAGE='create_user_table' [TYPE=schema|seed]"; \
 		exit 1; \
 	fi
 	@./$(NEW_MIGRATION) "$(MESSAGE)" "$(TYPE)"
@@ -35,33 +35,51 @@ db-migrate: up-db-service
 db-migrate-schema:
 	@$(MAKE) db-migrate TYPE=schema
 
-db-seed:
-	@$(MAKE) db-migrate TYPE=seed MIGRATIONS_PATH=$(MIGRATIONS_PATH)/schema
-
 db-undo-schema:
-	mvn -P$(ENV) flyway:undo \
-		-Dflyway.locations=filesystem:$(MIGRATIONS_PATH)/undo \
-		-DskipTests $(DEBUG_FLAG)
+	@$(MAKE) db-migrate TYPE=undo
 
-db-reset: up-db-service
+db-migrate-repeatable:
+	@$(MAKE) db-migrate TYPE=repeatable
+
+clean:
 	mvn -P$(ENV) flyway:clean \
-		-Dflyway.cleanDisabled=false \
-		-DskipTests $(DEBUG_FLAG)
-	mvn -P$(ENV) flyway:migrate \
-		-Dflyway.locations=filesystem:$(MIGRATIONS_PATH)/schema \
+ 		-Dflyway.cleanDisabled=false \
+ 		-DskipTests $(DEBUG_FLAG)
+
+db-reset: clean db-migrate-schema db-migrate-repeatable
+
+validate-migrations:
+	mvn -P$(ENV) flyway:validate \
+		-Dflyway.locations=filesystem:$(MIGRATIONS_PATH) \
 		-DskipTests $(DEBUG_FLAG)
 
 help:
-	@echo "Comandos disponíveis:"
-	@echo "  make create-migration MESSAGE='my_message' [TYPE=schema(default)|seed]"
-	@echo "  make db-migrate-schema [ENV=dev(default)|prod] [DEBUG=True]"
-	@echo "  make db-seed [ENV=dev(default)|prod] [DEBUG=True]"
-	@echo "  make db-undo-schema [ENV=dev(default)|prod] [DEBUG=True]"
-	@echo "  make db-reset [ENV=dev(default)|prod] [DEBUG=True]"
 	@echo ""
-	@echo "Exemplos:"
+	@echo "Comandos disponíveis:"
+	@echo "──────────────────────────────────────────────"
+	@echo "  make create-migration MESSAGE='msg' [TYPE=schema|seed]"
+	@echo "      → Cria nova migration numerada (schema) ou repeatable (seed)"
+	@echo ""
+	@echo "  make db-migrate-schema      → Executa migrations de schema (V###)"
+	@echo "  make db-migrate-repeatable  → Executa scripts repeatable (R__)"
+	@echo "  make db-undo-schema         → Desfaz migrations (U###)"
+	@echo ""
+	@echo "  make clean                  → Limpa o banco"
+	@echo "  make db-reset               → Recria o banco do zero (clean + migrate + repeatable)"
+	@echo "  make up-db-service          → Sobe o serviço do banco via docker-compose"
+	@echo ""
+	@echo "  make validate-migrations    → Valida integridade e nomes dos scripts"
+	@echo ""
+	@echo "Variáveis úteis:"
+	@echo "──────────────────────────────────────────────"
+	@echo "  ENV=<perfil>      → Define o profile Maven (default: dev)"
+	@echo "  DEBUG=true        → Mostra logs detalhados do Maven"
+	@echo "  MESSAGE='texto'   → Mensagem usada ao criar migrations"
+	@echo "  TYPE=schema|seed  → Tipo de migration a criar (default: schema)"
+	@echo ""
+	@echo "Exemplos rápidos:"
+	@echo "──────────────────────────────────────────────"
 	@echo "  make create-migration MESSAGE='create_user_table'"
 	@echo "  make create-migration MESSAGE='insert_users' TYPE=seed"
-	@echo "  make db-migrate-schema"
-	@echo "  make db-migrate-schema ENV=prod"
-
+	@echo "  make db-migrate-schema ENV=prod DEBUG=true"
+	@echo ""
