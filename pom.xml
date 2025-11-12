@@ -30,6 +30,9 @@
         <java.version>21</java.version>
         <org.mapstruct.version>1.6.0</org.mapstruct.version>
         <spring-boot.version>3.5.7</spring-boot.version>
+        <flyway.url>jdbc:postgresql://localhost:5432/essenzia_quiz_db</flyway.url>
+        <flyway.user>supersecretuser</flyway.user>
+        <flyway.password>supersecretpass</flyway.password>
     </properties>
     <dependencies>
 
@@ -69,13 +72,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- PostgreSQL -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
         <!-- OpenAPI / Swagger (springdoc) -->
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -103,7 +99,27 @@
             <version>1.18.34</version>
             <scope>provided</scope>
         </dependency>
-    </dependencies>
+
+        <!-- PostgreSQL -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+            <version>42.7.8</version>
+			<scope>runtime</scope>
+		</dependency>
+
+        <!-- Flyway -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>11.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>11.15.0</version>
+        </dependency>
+	</dependencies>
 
     <build>
         <plugins>
@@ -130,10 +146,35 @@
             </plugin>
 
             <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>11.15.0</version>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>42.7.8</version>
+                    </dependency>
+                </dependencies>
+
+                <configuration>
+                    <url>${flyway.url}</url>
+                    <user>${flyway.user}</user>
+                    <password>${flyway.password}</password>
+                    <schemas>
+                        <schema>public</schema>
+                    </schemas>
+                    <locations>
+                        <location>filesystem:db/migrations/migration</location>
+                    </locations>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
-
 </project>
