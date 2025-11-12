@@ -25,7 +25,7 @@ create-migration: $(NEW_MIGRATION)
 	@./$(NEW_MIGRATION) "$(MESSAGE)" "$(TYPE)"
 
 up-db-service:
-	docker-compose up -d db
+	docker compose up -d db
 
 db-migrate: up-db-service
 	mvn -P$(ENV) flyway:migrate \
@@ -66,7 +66,7 @@ help:
 	@echo ""
 	@echo "  make clean                  → Limpa o banco"
 	@echo "  make db-reset               → Recria o banco do zero (clean + migrate + repeatable)"
-	@echo "  make up-db-service          → Sobe o serviço do banco via docker-compose"
+	@echo "  make up-db-service          → Sobe o serviço do banco via docker compose"
 	@echo ""
 	@echo "  make validate-migrations    → Valida integridade e nomes dos scripts"
 	@echo ""
