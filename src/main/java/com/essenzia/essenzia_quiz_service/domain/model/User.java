@@ -1,7 +1,6 @@
 package com.essenzia.essenzia_quiz_service.domain.model;
 
 import com.essenzia.essenzia_quiz_service.domain.enums.YesNoMaybe;
-import com.essenzia.essenzia_quiz_service.domain.enums.converter.YesNoMaybeConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
