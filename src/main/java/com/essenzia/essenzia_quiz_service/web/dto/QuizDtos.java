@@ -5,7 +5,6 @@ import java.util.List;
 
 public class QuizDtos {
 
-    // GET /quiz/questions
     public record QuestionOption(Long id, String text) {
     }
 
@@ -15,7 +14,6 @@ public class QuizDtos {
     public record QuestionList(List<QuestionItem> items) {
     }
 
-    // GET /quiz/tiebreakers
     public record TiebreakerOption(Long id, String text) {
     }
 
@@ -25,14 +23,12 @@ public class QuizDtos {
     public record TiebreakerList(String[] pair, List<TiebreakerItem> items) {
     }
 
-    // POST /quiz/attempts
     public record StartAttemptRequest(Long userId) {
     }
 
     public record StartAttemptResponse(Long attemptId, Long userId, Instant startedAt) {
     }
 
-    // POST /quiz/attempts/{id}/answers
     public record AnswerItem(Long questionId, Long optionId) {
     }
 
@@ -45,7 +41,6 @@ public class QuizDtos {
     public record SubmitAnswersResponse(Long attemptId, Integer saved, NextQuestion nextQuestion) {
     }
 
-    // GET /quiz/attempts/{id}
     public record AttemptAnswer(Long questionId, Long optionId) {
     }
 
